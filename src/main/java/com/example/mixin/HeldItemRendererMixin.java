@@ -50,21 +50,21 @@ public class HeldItemRendererMixin {
         final boolean isMainHand = hand == Hand.MAIN_HAND;
         final boolean rightArm = player.getMainArm() == Arm.RIGHT;
 
-        matrices.translate(0.0D, 0.12D, -0.28D);
-
         matrices.push();
         try {
             if ((isMainHand && rightArm) || (!isMainHand && !rightArm)) {
-                matrices.translate(0.28D, 0.66D, -0.35D);
-                matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-68.0F));
-                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(18.0F));
-                matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(14.0F));
+                matrices.translate(0.8D, -0.6D, 0.2D);
+                matrices.scale(0.6f, 0.6f, 0.6f);
+                matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-75.0F));
+                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(25.0F));
+                matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(10.0F));
                 renderer.renderRightArm(matrices, vertexConsumers, light, player);
             } else {
-                matrices.translate(-0.28D, 0.66D, -0.35D);
-                matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-68.0F));
-                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-18.0F));
-                matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-14.0F));
+                matrices.translate(-0.8D, -0.6D, 0.2D);
+                matrices.scale(0.6f, 0.6f, 0.6f);
+                matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-75.0F));
+                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-25.0F));
+                matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-10.0F));
                 renderer.renderLeftArm(matrices, vertexConsumers, light, player);
             }
         } finally {
