@@ -15,9 +15,11 @@ repositories {
 }
 
 loom {
+	splitEnvironmentSourceSets()
 	mods {
 		"handflow" {
 			sourceSet sourceSets.main
+			sourceSet sourceSets.client
 		}
 	}
 }
