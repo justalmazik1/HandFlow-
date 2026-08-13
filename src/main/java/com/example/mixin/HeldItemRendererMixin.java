@@ -1,7 +1,9 @@
 package com.example.mixin;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.render.item.HeldItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
@@ -31,6 +33,20 @@ public class HeldItemRendererMixin {
         int light,
         CallbackInfo ci
     ) {
-        // Безопасная точка входа перед отрисовкой предмета/руки
+        if (player == null || MinecraftClient.getInstance().player == null) {
+            return;
+        }
+
+        PlayerEntityRenderer renderer = (PlayerEntityRenderer) MinecraftClient.getInstance()
+            .getEntityRenderDispatcher()
+            .getRenderer(player);
+
+        matrices.push();
+        try {
+            renderer.renderRightArm(matrices, vertexConsumers, light, player);
+            renderer.renderLeftArm(matrices, vertexConsumers, light, player);
+        } finally {
+            matrices.pop();
+        }
     }
 }
