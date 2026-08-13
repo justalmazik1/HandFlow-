@@ -1,26 +1,30 @@
 package com.example.mixin;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.render.item.HeldItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Arm;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.RotationAxis;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(HeldItemRenderer.class)
-public class HeldItemRendererMixin {
+public abstract class HeldItemRendererMixin {
+
+    @Shadow
+    protected abstract void renderItem(float equipProgress, MatrixStack matrices, VertexConsumerProvider.Immediate vertexConsumers, AbstractClientPlayerEntity player, int light);
+
+    @Shadow
+    protected abstract void renderArm(MatrixStack matrices, VertexConsumerProvider.Immediate vertexConsumers, int light, AbstractClientPlayerEntity player, boolean showArm);
 
     @Inject(
         method = "renderFirstPersonItem",
-        at = @At("HEAD")
+        at = @At("HEAD"),
+        cancellable = true
     )
     private void handflow$renderFirstPersonItem(
         AbstractClientPlayerEntity player,
@@ -35,38 +39,27 @@ public class HeldItemRendererMixin {
         int light,
         CallbackInfo ci
     ) {
-        if (player == null || MinecraftClient.getInstance().player == null) {
+        if (player == null || hand == null) {
             return;
         }
 
-        PlayerEntityRenderer renderer = (PlayerEntityRenderer) MinecraftClient.getInstance()
-            .getEntityRenderDispatcher()
-            .getRenderer(player);
-
-        if (hand == null) {
-            return;
-        }
-
-        final boolean isMainHand = hand == Hand.MAIN_HAND;
-        final boolean rightArm = player.getMainArm() == Arm.RIGHT;
+        // Cancel the vanilla rendering
+        ci.cancel();
 
         matrices.push();
         try {
-            if ((isMainHand && rightArm) || (!isMainHand && !rightArm)) {
-                matrices.translate(0.8D, -0.6D, 0.2D);
-                matrices.scale(0.6f, 0.6f, 0.6f);
-                matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-75.0F));
-                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(25.0F));
-                matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(10.0F));
-                renderer.renderRightArm(matrices, vertexConsumers, light, player);
-            } else {
-                matrices.translate(-0.8D, -0.6D, 0.2D);
-                matrices.scale(0.6f, 0.6f, 0.6f);
-                matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-75.0F));
-                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-25.0F));
-                matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-10.0F));
-                renderer.renderLeftArm(matrices, vertexConsumers, light, player);
-            }
+            // Scale down the hand/item model
+            matrices.scale(0.6f, 0.6f, 0.6f);
+
+            // Translate to the lower right corner of the screen
+            // X: positive = right, Y: negative = down, Z: negative = away from camera
+            matrices.translate(0.8D, -0.5D, -0.7D);
+
+            // Render the arm at this new position
+            this.renderArm(matrices, (VertexConsumerProvider.Immediate) vertexConsumers, light, player, true);
+
+            // Render the held item in the arm's hand
+            this.renderItem(equipProgress, matrices, (VertexConsumerProvider.Immediate) vertexConsumers, player, light);
         } finally {
             matrices.pop();
         }
