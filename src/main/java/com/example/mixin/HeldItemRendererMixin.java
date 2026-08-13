@@ -5,28 +5,20 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.item.HeldItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Arm;
 import net.minecraft.util.Hand;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(HeldItemRenderer.class)
-public abstract class HeldItemRendererMixin {
-
-    @Shadow
-    protected abstract void renderArmHoldingItem(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, float equipProgress, float swingProgress, Arm arm);
+public class HeldItemRendererMixin {
 
     @Inject(
         method = "renderFirstPersonItem",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/render/item/HeldItemRenderer;renderItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformationMode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V"
-        )
+        at = @At("HEAD")
     )
-    private void onRenderItem(
+    private void onRenderFirstPersonItem(
         AbstractClientPlayerEntity player,
         float tickDelta,
         float pitch,
@@ -39,7 +31,6 @@ public abstract class HeldItemRendererMixin {
         int light,
         CallbackInfo ci
     ) {
-        Arm arm = (hand == Hand.MAIN_HAND) ? player.getMainArm() : player.getMainArm().getOpposite();
-        this.renderArmHoldingItem(matrices, vertexConsumers, light, equipProgress, swingProgress, arm);
+        // Безопасная точка входа перед отрисовкой предмета/руки
     }
 }
