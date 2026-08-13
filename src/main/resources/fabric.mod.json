@@ -19,7 +19,8 @@
     ]
   },
   "mixins": [
-    "handflow.mixins.json"
+    "handflow.mixins.json",
+    "modid.client.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.15.0",
