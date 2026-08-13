@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "handflow",
+  "version": "${version}",
+  "name": "HandFlow+",
+  "description": "Smooth first-person hand and tool animations, inspired by Punchy and Hold My Items!",
+  "authors": [
+    "JustAlmazik"
+  ],
+  "contact": {
+    "sources": "https://github.com/justalmazik1/HandFlow-"
+  },
+  "license": "CC0-1.0",
+  "icon": "assets/handflow/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.example.client.ExampleModClient"
+    ]
+  },
+  "mixins": [
+    "handflow.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "minecraft": "~1.20.1",
+    "java": ">=17",
+    "fabric-api": "*"
+  }
+}
