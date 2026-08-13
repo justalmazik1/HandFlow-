@@ -7,6 +7,7 @@ import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.render.item.HeldItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Arm;
 import net.minecraft.util.Hand;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,7 +21,7 @@ public class HeldItemRendererMixin {
         method = "renderFirstPersonItem",
         at = @At("HEAD")
     )
-    private void onRenderFirstPersonItem(
+    private void handflow$renderFirstPersonItem(
         AbstractClientPlayerEntity player,
         float tickDelta,
         float pitch,
@@ -41,10 +42,22 @@ public class HeldItemRendererMixin {
             .getEntityRenderDispatcher()
             .getRenderer(player);
 
+        if (hand == null) {
+            return;
+        }
+
+        final boolean isMainHand = hand == Hand.MAIN_HAND;
+        final boolean rightArm = player.getMainArm() == Arm.RIGHT;
+
+        matrices.translate(0.0D, 0.075D, -0.38D);
+
         matrices.push();
         try {
-            renderer.renderRightArm(matrices, vertexConsumers, light, player);
-            renderer.renderLeftArm(matrices, vertexConsumers, light, player);
+            if ((isMainHand && rightArm) || (!isMainHand && !rightArm)) {
+                renderer.renderRightArm(matrices, vertexConsumers, light, player);
+            } else {
+                renderer.renderLeftArm(matrices, vertexConsumers, light, player);
+            }
         } finally {
             matrices.pop();
         }
