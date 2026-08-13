@@ -14,11 +14,18 @@ repositories {
 	// for more information about repositories.
 }
 
+sourceSets {
+	client {
+		compileClasspath += main.compileClasspath + main.output
+		runtimeClasspath += main.runtimeClasspath + main.output
+	}
+}
+
 loom {
 	splitEnvironmentSourceSets()
 
 	mods {
-		"modid" {
+		"handflow" {
 			sourceSet sourceSets.main
 			sourceSet sourceSets.client
 		}
